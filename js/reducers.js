@@ -1,16 +1,28 @@
-import { UPDATE_DATA } from './actions.js';
+import {
+  UPDATE_DATA, UPDATE_COUNTRIES, UPDATE_BORDERS
+} from './actions.js';
+
+function generateReducer(defaultState, actionName) {
+  return function(state = defaultState, action) {
+    if(action.type !== actionName) { return state; }
+    return action.data;
+  }
+}
 
 var initialState = {
-  data : []
+  data : [],
+  countries : [],
+  borders : []
 };
 
-function dataReducer(state = [], action) {
-  if(action.type !== UPDATE_DATA) { return state; }
-  return action.data;
-}
+var dataReducer = generateReducer([], UPDATE_DATA);
+var countriesReducer = generateReducer([], UPDATE_COUNTRIES);
+var bordersReducer = generateReducer([], UPDATE_BORDERS);
 
 export default function updateState(state = initialState, action) {
   return {
-    data : dataReducer(state.data, action)
+    data : dataReducer(state.data, action),
+    countries : countriesReducer(state.countries, action),
+    borders : bordersReducer(state.borders, action)
   };
 }
