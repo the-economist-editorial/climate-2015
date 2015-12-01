@@ -21,29 +21,32 @@ import { connect, Provider } from 'react-redux';
 import { updateData, updateCountries, updateBorders } from './actions.js';
 import updateState from './reducers.js';
 
-const CREATESTORE = compose(window.devToolsExtension() || (f => f))(createStore);
-// const CREATESTORE = createStore;
+// const CREATESTORE = compose(window.devToolsExtension() || (f => f))(createStore);
+const CREATESTORE = createStore;
 var store = CREATESTORE(updateState);
 
 var D3Map = connect(function(state) {
   return {
     layers : [
-      state.countries,
-      state.borders
+      { data : state.countries, name : 'countries' },
+      { data : state.borders, name : 'borders' }
     ]
   };
 })(D3MapRaw);
 
 class Chart extends ChartContainer {
   render() {
+    var mapHeight = 400;
+
     var mapProps = {
-      duration : null
+      duration : null,
+      height : mapHeight
     };
 
     return(
       <div className='chart-container'>
         <Header title="A map" subtitle="Also to come"/>
-        <svg height="400" width="595">
+        <svg height={mapHeight} width="595">
           <D3Map {...mapProps} />
         </svg>
       </div>
@@ -66,4 +69,4 @@ function fetchTopojson(file, action, group) {
 }
 
 fetchTopojson('./data/countries.json', updateCountries, 'ne_10m_admin_0_countries_lakes');
-// fetchTopojson('./data/borders.json', updateBorders, 'ne_10m_admin_0_countries_lakes');
+fetchTopojson('./data/borders.json', updateBorders, 'ne_10m_admin_0_countries_lakes');

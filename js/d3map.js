@@ -1,8 +1,9 @@
 import d3 from 'd3';
 import React from 'react';
 import RFD from 'react-faux-dom';
-// import BoundedSVG from './bounded-svg.js';
 import SVGComponent from './svg-component.js';
+
+import '../node_modules/d3-geo-projection/d3.geo.projection.js';
 
 import topojson from 'topojson';
 
@@ -13,7 +14,7 @@ class MapLayer extends SVGComponent {
     };
   }
   render() {
-    console.log("has datas!", this.props.data);
+    console.log("has datas!", this.props.data, this.props.projection);
     var el = RFD.createElement('g');
     var sel = d3.select(el);
 
@@ -40,7 +41,7 @@ export default class D3Map extends SVGComponent {
   static get defaultProps() {
     return {
       duration : 500,
-      projection : d3.geo.mercator(),
+      projection : d3.geo.robinson().scale(100),
       layerAttrs : [],
       layerHandlers : []
     };
@@ -49,12 +50,13 @@ export default class D3Map extends SVGComponent {
     var layers = this.props.layers;
     var projection = this.props.projection.translate([595/2,this.props.height/2]);
 
-    var layerElements = layers.filter(v => v).map((layer, name) => {
+    var layerElements = layers.map((layer) => {
+      var name = layer.name;
       var props = {
         elementClass : name,
         duration : this.props.duration,
         projection : projection,
-        data : layer,
+        data : layer.data,
         attrs : this.props.layerAttrs[name] || {},
         handlers : this.props.layerHandlers[name] || {}
       };
