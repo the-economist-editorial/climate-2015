@@ -63,10 +63,11 @@ var chart = React.render(
   </Provider>, document.getElementById('interactive'));
 
 function fetchTopojson(file, action, group) {
-  d3.json('./data/countries.json', function(error, data) {
+  d3.json(file, function(error, data) {
+    console.log(Object.keys(data.objects));
     store.dispatch(action(topojson.feature(data, data.objects[group]).features));
   });
 }
 
-fetchTopojson('./data/countries.json', updateCountries, 'ne_10m_admin_0_countries_lakes');
-fetchTopojson('./data/borders.json', updateBorders, 'ne_10m_admin_0_countries_lakes');
+fetchTopojson('./data/countries.json', updateCountries, 'ne_50m_admin_0_countries_lakes');
+fetchTopojson('./data/borders.json', updateBorders, 'ne_50m_admin_0_boundary_lines_land');
