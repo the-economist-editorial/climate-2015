@@ -14,7 +14,6 @@ class MapLayer extends SVGComponent {
     };
   }
   render() {
-    console.log("has datas!", this.props.data, this.props.projection);
     var el = RFD.createElement('g');
     var sel = d3.select(el);
 
@@ -37,13 +36,26 @@ class MapLayer extends SVGComponent {
   }
 }
 
+/**
+ * D3Map component
+ *
+ * A basic d3 map, meant to work with topojson data
+ *
+ * @prop {array} layers - the geodata; array should be structured as:
+ *       { name : STRING, data : TOPOJSON ARRAY }
+ * @prop {object} layerAttrs - a keyed list of attributes for each
+ *       layer; layers should be referenced with their name as the key
+ * @prop {object} layerHandlers - a keyed list of event handlers for
+ *       each layer; layers referenced with their name as the key
+ * @prop {number|boolean} - duration broken for now...
+ */
 export default class D3Map extends SVGComponent {
   static get defaultProps() {
     return {
-      duration : 500,
+      duration : null,
       projection : d3.geo.robinson().scale(100),
-      layerAttrs : [],
-      layerHandlers : []
+      layerAttrs : {},
+      layerHandlers : {}
     };
   }
   render() {
@@ -58,7 +70,8 @@ export default class D3Map extends SVGComponent {
         projection : projection,
         data : layer.data,
         attrs : this.props.layerAttrs[name] || {},
-        handlers : this.props.layerHandlers[name] || {}
+        handlers : this.props.layerHandlers[name] || {},
+        key : name
       };
 
       return (<MapLayer {...props} />);

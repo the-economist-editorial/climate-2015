@@ -10,7 +10,6 @@ export function updateData(data) {
 }
 
 export function updateBorders(data) {
-  console.log(data);
   return {
     type : UPDATE_BORDERS,
     data

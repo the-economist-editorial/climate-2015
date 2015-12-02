@@ -2,10 +2,10 @@
 
 .borders {
   fill : none;
-  stroke : red;
-  stroke-width : 0.4;
+  stroke : white;
+  stroke-width : 0.5;
 }
 
 .countries {
-  fill : var(--grey-9);
+  /*fill : var(--grey-9);*/
 }
