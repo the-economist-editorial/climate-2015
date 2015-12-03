@@ -1,5 +1,5 @@
 import {
-  UPDATE_DATA, UPDATE_COUNTRIES, UPDATE_BORDERS
+  UPDATE_DATA, UPDATE_COUNTRIES, UPDATE_BORDERS, UPDATE_ACTIVE_DATA
 } from './actions.js';
 
 function generateReducer(defaultState, actionName) {
@@ -12,17 +12,24 @@ function generateReducer(defaultState, actionName) {
 var initialState = {
   data : [],
   countries : [],
-  borders : []
+  borders : [],
+  activeData : 'co2_2012'
 };
 
-var dataReducer = generateReducer([], UPDATE_DATA);
-var countriesReducer = generateReducer([], UPDATE_COUNTRIES);
-var bordersReducer = generateReducer([], UPDATE_BORDERS);
+var dataReducer = generateReducer(
+  initialState.data, UPDATE_DATA);
+var countriesReducer = generateReducer(
+  initialState.countries, UPDATE_COUNTRIES);
+var bordersReducer = generateReducer(
+  initialState.borders, UPDATE_BORDERS);
+var activeDataReducer = generateReducer(
+  initialState.activeData, UPDATE_ACTIVE_DATA);
 
 export default function updateState(state = initialState, action) {
   return {
     data : dataReducer(state.data, action),
     countries : countriesReducer(state.countries, action),
-    borders : bordersReducer(state.borders, action)
+    borders : bordersReducer(state.borders, action),
+    activeData : activeDataReducer(state.activeData, action)
   };
 }

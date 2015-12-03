@@ -18,17 +18,21 @@ import chroma from 'chroma-js';
 import { createStore, compose } from 'redux';
 import { connect, Provider } from 'react-redux';
 
-import { updateData, updateCountries, updateBorders } from './actions.js';
+import {
+  updateData, updateCountries, updateBorders, updateActiveData
+} from './actions.js';
 import updateState from './reducers.js';
 
 // const CREATESTORE = compose(window.devToolsExtension() || (f => f))(createStore);
 const CREATESTORE = createStore;
 var store = CREATESTORE(updateState);
+window.store = store;
 
+var scaleColours = [colours.blue[1], colours.red[3], colours.red[0]];
 var scales = {
-  co2_2012 : chroma.scale([colours.red[3],colours.red[0]]).mode('lab').domain([0,1e7]),
-  co2pc_2012 : chroma.scale([colours.red[3],colours.red[0]]).mode('lab').domain([0,25]),
-  co2pcgdp_2012 : chroma.scale([colours.red[3],colours.red[0]]).mode('lab').domain([0,2000])
+  co2_2012 : chroma.scale(scaleColours).mode('lab').domain([0,1e4,1e7]),
+  co2pc_2012 : chroma.scale(scaleColours).mode('lab').domain([0,4,22]),
+  co2pcgdp_2012 : chroma.scale(scaleColours).mode('lab').domain([0,100,2000])
 };
 var dataFocus = 'co2pcgdp_2012';
 
@@ -46,7 +50,7 @@ var D3Map = connect(function(state) {
           var data = state.data.filter(r => r.ISO === iso);
           data = data.length ? data[0] : null;
           if(hasData && data) {
-            return scales[dataFocus](data[dataFocus]);
+            return scales[state.activeData](data[state.activeData]);
           }
           // no data
           return colours.grey[9];
@@ -56,10 +60,22 @@ var D3Map = connect(function(state) {
   };
 })(D3MapRaw);
 
+var MeasureToggleGroup = connectMap({
+  value : 'activeData'
+})(ToggleBarRaw);
+
 class Chart extends ChartContainer {
   render() {
-    var mapHeight = 400;
+    var measureToggleProps = {
+      items : [
+        { title : 'CO2', key : 'co2_2012', value : 'co2_2012' },
+        { title : 'CO2 Per Capita', key : 'co2pc_2012', value : 'co2pc_2012' },
+        { title : 'CO2 Per Capita GDP', key : 'co2pcgdp_2012', value : 'co2pcgdp_2012' }
+      ],
+      action : (v) => { store.dispatch(updateActiveData(v)); }
+    };
 
+    var mapHeight = 400;
     var mapProps = {
       duration : null,
       height : mapHeight
@@ -68,6 +84,7 @@ class Chart extends ChartContainer {
     return(
       <div className='chart-container'>
         <Header title="A map" subtitle="Also to come"/>
+        <MeasureToggleGroup {...measureToggleProps} />
         <svg height={mapHeight} width="595">
           <D3Map {...mapProps} />
         </svg>
