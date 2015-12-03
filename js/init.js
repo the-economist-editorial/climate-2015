@@ -30,11 +30,11 @@ window.store = store;
 
 var scaleColours = [colours.blue[1], colours.red[3], colours.red[0]];
 var scales = {
-  co2_2012 : chroma.scale(scaleColours).mode('lab').domain([0,1e4,1e7]),
-  co2pc_2012 : chroma.scale(scaleColours).mode('lab').domain([0,4,22]),
-  co2pcgdp_2012 : chroma.scale(scaleColours).mode('lab').domain([0,100,2000])
+  co2 : chroma.scale(scaleColours).mode('lab').domain([0,1e4,1e7]),
+  co2pc : chroma.scale(scaleColours).mode('lab').domain([0,3,22]),
+  co2pcgdp : chroma.scale(scaleColours).mode('lab').domain([0,200,2000])
 };
-var dataFocus = 'co2pcgdp_2012';
+var dataFocus = '2012';
 
 var D3Map = connect(function(state) {
   var hasData = !!state.data.length;
@@ -50,7 +50,7 @@ var D3Map = connect(function(state) {
           var data = state.data.filter(r => r.ISO === iso);
           data = data.length ? data[0] : null;
           if(hasData && data) {
-            return scales[state.activeData](data[state.activeData]);
+            return scales[state.activeData](data[state.activeData][dataFocus]);
           }
           // no data
           return colours.grey[9];
@@ -68,9 +68,9 @@ class Chart extends ChartContainer {
   render() {
     var measureToggleProps = {
       items : [
-        { title : 'CO2', key : 'co2_2012', value : 'co2_2012' },
-        { title : 'CO2 Per Capita', key : 'co2pc_2012', value : 'co2pc_2012' },
-        { title : 'CO2 Per Capita GDP', key : 'co2pcgdp_2012', value : 'co2pcgdp_2012' }
+        { title : 'CO2', key : 'co2', value : 'co2' },
+        { title : 'CO2 per capita', key : 'co2pc', value : 'co2pc' },
+        { title : 'CO2 per capita GDP', key : 'co2pcgdp', value : 'co2pcgdp' }
       ],
       action : (v) => { store.dispatch(updateActiveData(v)); }
     };
@@ -108,7 +108,27 @@ function fetchTopojson(file, action, group) {
 }
 
 d3.csv('../data/joined.csv', function(err, data) {
+  const DATA_SERIES = ['co2', 'co2pc', 'co2pcgdp', 'ghg', 'ghgpc'];
   data = data.map(parseNumerics);
+
+  data = data.map(d => {
+    var values = DATA_SERIES.map(series => {
+      var keyList = Object.keys(d).filter(k => k.split('_')[0] === series);
+      var valueList = keyList.map(key => d[key]);
+      var yearList = keyList.map(k => k.split('_')[1]);
+      var obj = {};
+      for (let i in yearList) {
+        obj[yearList[i]] = valueList[i];
+      }
+      return obj;
+    });
+    var ret = { 'ISO' : d.ISO };
+
+    for (let i in values) {
+      ret[DATA_SERIES[i]] = values[i];
+    }
+    return ret;
+  });
   store.dispatch(updateData(data));
 });
 

@@ -13,7 +13,7 @@ var initialState = {
   data : [],
   countries : [],
   borders : [],
-  activeData : 'co2_2012'
+  activeData : 'co2'
 };
 
 var dataReducer = generateReducer(
