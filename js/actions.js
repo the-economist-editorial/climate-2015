@@ -2,6 +2,7 @@ export const UPDATE_DATA = 'UPDATE_DATA';
 export const UPDATE_BORDERS = 'UPDATE_BORDERS';
 export const UPDATE_COUNTRIES = 'UPDATE_COUNTRIES';
 export const UPDATE_ACTIVE_DATA = 'UPDATE_ACTIVE_DATA';
+export const CHANGE_TOOLTIP = 'CHANGE_TOOLTIP';
 
 export function updateData(data) {
   return {
@@ -27,4 +28,18 @@ export function updateActiveData(data) {
     type : UPDATE_ACTIVE_DATA,
     data
   }
+}
+
+function showTooltip(contents) {
+  return {
+    type : CHANGE_TOOLTIP,
+    show : true,
+    contents
+  };
+}
+function hideTooltip() {
+  return {
+    type : CHANGE_TOOLTIP,
+    show : false
+  };
 }

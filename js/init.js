@@ -11,6 +11,7 @@ import colours from './econ_colours.js';
 import Header from './header.js';
 import ToggleBarRaw from './toggle-bar.js';
 import D3MapRaw from './d3map.js';
+import TooltipRaw from './tooltip.js';
 import ChartContainer from './chart-container.js';
 
 import chroma from 'chroma-js';
@@ -19,7 +20,8 @@ import { createStore, compose } from 'redux';
 import { connect, Provider } from 'react-redux';
 
 import {
-  updateData, updateCountries, updateBorders, updateActiveData
+  updateData, updateCountries, updateBorders, updateActiveData,
+  showTooltip, hideTooltip
 } from './actions.js';
 import updateState from './reducers.js';
 
@@ -32,7 +34,9 @@ var scaleColours = [colours.blue[1], colours.red[3], colours.red[0]];
 var scales = {
   co2 : chroma.scale(scaleColours).mode('lab').domain([0,1e4,1e7]),
   co2pc : chroma.scale(scaleColours).mode('lab').domain([0,3,22]),
-  co2pcgdp : chroma.scale(scaleColours).mode('lab').domain([0,200,2000])
+  co2pcgdp : chroma.scale(scaleColours).mode('lab').domain([0,200,2000]),
+  ghg : chroma.scale(scaleColours).mode('lab').domain([0,1e5,1.25e7]),
+  ghgpc : chroma.scale(scaleColours).mode('lab').domain([0,5,25])
 };
 var dataFocus = '2012';
 
@@ -64,13 +68,19 @@ var MeasureToggleGroup = connectMap({
   value : 'activeData'
 })(ToggleBarRaw);
 
+var Tooltip = connectMap({
+  show : 'tooltipShow'
+})(TooltipRaw);
+
 class Chart extends ChartContainer {
   render() {
     var measureToggleProps = {
       items : [
         { title : 'CO2', key : 'co2', value : 'co2' },
         { title : 'CO2 per capita', key : 'co2pc', value : 'co2pc' },
-        { title : 'CO2 per capita GDP', key : 'co2pcgdp', value : 'co2pcgdp' }
+        { title : 'CO2 per capita GDP', key : 'co2pcgdp', value : 'co2pcgdp' },
+        { title : 'Greenhouse gasses', key : 'ghg', 'value' : 'ghg' },
+        { title : 'GHG per capita', key : 'ghgpc', 'value' : 'ghgpc'}
       ],
       action : (v) => { store.dispatch(updateActiveData(v)); }
     };
@@ -78,7 +88,14 @@ class Chart extends ChartContainer {
     var mapHeight = 400;
     var mapProps = {
       duration : null,
-      height : mapHeight
+      height : mapHeight,
+      layerHandlers : {
+        'countries' : {
+          mouseEnter : function(d) {
+            console.log(d);
+          }
+        }
+      }
     };
 
     return(
@@ -88,6 +105,7 @@ class Chart extends ChartContainer {
         <svg height={mapHeight} width="595">
           <D3Map {...mapProps} />
         </svg>
+        <Tooltip />
       </div>
     );
   }

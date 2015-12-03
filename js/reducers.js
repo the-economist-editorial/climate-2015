@@ -1,5 +1,6 @@
 import {
-  UPDATE_DATA, UPDATE_COUNTRIES, UPDATE_BORDERS, UPDATE_ACTIVE_DATA
+  UPDATE_DATA, UPDATE_COUNTRIES, UPDATE_BORDERS,
+  UPDATE_ACTIVE_DATA, UPDATE_TOOLTIP_TARGET
 } from './actions.js';
 
 function generateReducer(defaultState, actionName) {
@@ -13,7 +14,8 @@ var initialState = {
   data : [],
   countries : [],
   borders : [],
-  activeData : 'co2'
+  activeData : 'co2',
+  tooltipTarget : null
 };
 
 var dataReducer = generateReducer(
@@ -24,12 +26,15 @@ var bordersReducer = generateReducer(
   initialState.borders, UPDATE_BORDERS);
 var activeDataReducer = generateReducer(
   initialState.activeData, UPDATE_ACTIVE_DATA);
+var tooltipTargetReducer = generateReducer(
+  initialState.tooltipTarget, UPDATE_TOOLTIP_TARGET);
 
 export default function updateState(state = initialState, action) {
   return {
     data : dataReducer(state.data, action),
     countries : countriesReducer(state.countries, action),
     borders : bordersReducer(state.borders, action),
-    activeData : activeDataReducer(state.activeData, action)
+    activeData : activeDataReducer(state.activeData, action),
+    tooltipTarget : tooltipTargetReducer(state.tooltipTarget, action)
   };
 }
