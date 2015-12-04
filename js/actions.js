@@ -30,14 +30,14 @@ export function updateActiveData(data) {
   }
 }
 
-function showTooltip(contents) {
+export function showTooltip(contents) {
   return {
     type : CHANGE_TOOLTIP,
     show : true,
     contents
   };
 }
-function hideTooltip() {
+export function hideTooltip() {
   return {
     type : CHANGE_TOOLTIP,
     show : false

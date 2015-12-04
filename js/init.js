@@ -90,9 +90,15 @@ class Chart extends ChartContainer {
       duration : null,
       height : mapHeight,
       layerHandlers : {
-        'countries' : {
-          mouseEnter : function(d) {
-            console.log(d);
+        countries : {
+          mouseenter : function(d) {
+            console.log(d3.event);
+            var key = d.properties.iso_a3;
+            var data = store.getState().data.find(v => v.ISO === key);
+            store.dispatch(showTooltip(data));
+          },
+          mouseleave : function(d) {
+            store.dispatch(hideTooltip());
           }
         }
       }

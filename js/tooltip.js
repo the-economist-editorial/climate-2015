@@ -14,11 +14,17 @@ export default class Tooltip extends InteractiveComponent {
       template : () => {
         return (<span>Hark! a tooltip.</span>);
       },
-      show : false
+      show : false,
+      mouseX : 10,
+      mouseY : 10
     }
   }
   render() {
     var tooltipProps = {
+      style : {
+        left : this.props.mouseX,
+        top : this.props.mouseY
+      },
       className : ['tooltip', this.props.show ? null : 'tooltip-hidden']
         .filter((n => n != null)).join(' ')
     };

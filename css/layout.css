@@ -126,4 +126,17 @@
       }
     }
   }
+
+  .tooltip {
+    position: absolute;
+    max-width: 50%;
+    border: 1px solid var(--grey-3);
+    background-color: white;
+
+    z-index: 1000;
+
+    &.tooltip-hidden {
+      display: none;
+    }
+  }
 }
