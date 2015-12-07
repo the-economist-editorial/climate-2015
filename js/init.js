@@ -33,12 +33,27 @@ var store = CREATESTORE(updateState);
 window.store = store;
 
 var scaleColours = [colours.blue[1], colours.red[3], colours.red[0]];
-var scales = {
-  co2 : chroma.scale(scaleColours).mode('lab').domain([0,1e4,1e7]),
-  co2pc : chroma.scale(scaleColours).mode('lab').domain([0,3,22]),
-  co2pcgdp : chroma.scale(scaleColours).mode('lab').domain([0,200,2000]),
-  ghg : chroma.scale(scaleColours).mode('lab').domain([0,1e5,1.25e7]),
-  ghgpc : chroma.scale(scaleColours).mode('lab').domain([0,5,25])
+var datasets = {
+  co2 : {
+    scale : chroma.scale(scaleColours).mode('lab').domain([0,1e4,1e7]),
+    formatter : d3.format(',.0f')
+  },
+  co2pc : {
+    scale : chroma.scale(scaleColours).mode('lab').domain([0,3,22]),
+    formatter : d3.format(',.2f')
+  },
+  co2pcgdp : {
+    scale : chroma.scale(scaleColours).mode('lab').domain([0,200,2000]),
+    formatter : d3.format(',.2f')
+  },
+  ghg : {
+    scale : chroma.scale(scaleColours).mode('lab').domain([0,1e5,1.25e7]),
+    formatter : d3.format(',.0f')
+  },
+  ghgpc : {
+    scale : chroma.scale(scaleColours).mode('lab').domain([0,5,25]),
+    formatter : d3.format(',.2f')
+  }
 };
 
 var D3Map = connect(function(state) {
@@ -55,7 +70,7 @@ var D3Map = connect(function(state) {
           var data = state.data.filter(r => r.ISO === iso);
           data = data.length ? data[0] : null;
           if(hasData && data) {
-            return scales[state.activeData](data[state.activeData][state.activeYear]);
+            return datasets[state.activeData].scale(data[state.activeData][state.activeYear]);
           }
           // no data
           return colours.grey[9];
@@ -78,9 +93,10 @@ var Tooltip = connect(function(state) {
       if(!state.tooltipContents) { return ''; }
       var iso = state.tooltipContents.ISO;
       var countryName = iso ? countries[iso].name : '';
+      var datum = state.tooltipContents[state.activeData][state.activeYear];
       return (<div>
         <h4>{countryName}</h4>
-        <div>{state.tooltipContents[state.activeData][state.activeYear]}</div>
+        <div>{datasets[state.activeData].formatter(datum)}</div>
       </div>);
     }
   };

@@ -9,3 +9,8 @@
 .countries {
   /*fill : var(--grey-9);*/
 }
+
+.tooltip {
+  font-size: 14px;
+  padding: 2px 5px;
+}

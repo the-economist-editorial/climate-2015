@@ -16,13 +16,18 @@ export default class Tooltip extends InteractiveComponent {
       },
       show : false,
       mouseX : 10,
-      mouseY : 10
+      mouseY : 10,
+      fullWidth : 595
     }
   }
   render() {
+    var x = this.props.mouseX;
+    var rightAlign = x > this.props.fullWidth / 2;
+
     var tooltipProps = {
       style : {
-        left : this.props.mouseX,
+        left : rightAlign ? '' : x,
+        right : rightAlign ? this.props.fullWidth - x : '',
         top : this.props.mouseY
       },
       className : ['tooltip', this.props.show ? null : 'tooltip-hidden']
