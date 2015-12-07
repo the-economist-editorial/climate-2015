@@ -13,6 +13,7 @@ import ToggleBarRaw from './toggle-bar.js';
 import D3MapRaw from './d3map.js';
 import TooltipRaw from './tooltip.js';
 import ChartContainer from './chart-container.js';
+import GradientScaleRaw from './gradient-scale.js';
 
 import countries from './countries.js';
 
@@ -36,11 +37,13 @@ var scaleColours = [colours.blue[1], colours.red[3], colours.red[0]];
 var datasets = {
   co2 : {
     scale : chroma.scale(scaleColours).mode('lab').domain([0,1e4,1e7]),
-    formatter : d3.format(',.0f')
+    formatter : d3.format(',.0f'),
+    tag : [0, 1e4, 1e7]
   },
   co2pc : {
     scale : chroma.scale(scaleColours).mode('lab').domain([0,3,22]),
-    formatter : d3.format(',.2f')
+    formatter : d3.format(',.2f'),
+    tag : [0, 3, 22]
   },
   co2pcgdp : {
     scale : chroma.scale(scaleColours).mode('lab').domain([0,200,2000]),
@@ -86,7 +89,7 @@ var MeasureToggleGroup = connectMap({
 
 var Tooltip = connect(function(state) {
   return {
-    show : state.tooltipShow,
+    show : countries.hasOwnProperty(state.tooltipContents && state.tooltipContents.ISO) ? state.tooltipShow : false,
     mouseX : state.tooltipContents && state.tooltipContents.mouseX,
     mouseY : state.tooltipContents && state.tooltipContents.mouseY,
     template : function() {
@@ -102,20 +105,26 @@ var Tooltip = connect(function(state) {
   };
 })(TooltipRaw);
 
+var GradientScale = connect(function(state) {
+  return {
+    scale : datasets[state.activeData].scale
+  };
+})(GradientScaleRaw);
+
 class Chart extends ChartContainer {
   render() {
     var measureToggleProps = {
       items : [
         { title : 'CO2', key : 'co2', value : 'co2' },
         { title : 'CO2 per capita', key : 'co2pc', value : 'co2pc' },
-        { title : 'CO2 per capita GDP', key : 'co2pcgdp', value : 'co2pcgdp' },
-        { title : 'Greenhouse gasses', key : 'ghg', 'value' : 'ghg' },
+        { title : 'CO2 per GDP', key : 'co2pcgdp', value : 'co2pcgdp' },
+        { title : 'Greenhouse gases', key : 'ghg', 'value' : 'ghg' },
         { title : 'GHG per capita', key : 'ghgpc', 'value' : 'ghgpc'}
       ],
       action : (v) => { store.dispatch(updateActiveData(v)); }
     };
 
-    var mapHeight = 400;
+    var mapHeight = 320;
     var mapProps = {
       duration : null,
       height : mapHeight,
@@ -138,25 +147,27 @@ class Chart extends ChartContainer {
       }
     };
 
+    var gradientScaleProps = {
+      margin : [320, 10, 10]
+    }
+
     return(
       <div className='chart-container'>
         <Header title="A map" subtitle="Also to come"/>
         <MeasureToggleGroup {...measureToggleProps} />
-        <svg height={mapHeight} width="595">
+        <svg height={mapHeight + 50} width="595">
           <D3Map {...mapProps} />
+          <GradientScale {...gradientScaleProps} />
         </svg>
         <Tooltip />
       </div>
     );
   }
 }
-var props = {
-  height : 320
-};
 
 var chart = React.render(
   <Provider store={store}>
-    {() => <Chart {...props} />}
+    {() => <Chart />}
   </Provider>, document.getElementById('interactive'));
 
 function fetchTopojson(file, action, group) {
