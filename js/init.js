@@ -14,6 +14,8 @@ import D3MapRaw from './d3map.js';
 import TooltipRaw from './tooltip.js';
 import ChartContainer from './chart-container.js';
 
+import countries from './countries.js';
+
 import chroma from 'chroma-js';
 
 import { createStore, compose } from 'redux';
@@ -38,7 +40,6 @@ var scales = {
   ghg : chroma.scale(scaleColours).mode('lab').domain([0,1e5,1.25e7]),
   ghgpc : chroma.scale(scaleColours).mode('lab').domain([0,5,25])
 };
-var dataFocus = '2012';
 
 var D3Map = connect(function(state) {
   var hasData = !!state.data.length;
@@ -54,7 +55,7 @@ var D3Map = connect(function(state) {
           var data = state.data.filter(r => r.ISO === iso);
           data = data.length ? data[0] : null;
           if(hasData && data) {
-            return scales[state.activeData](data[state.activeData][dataFocus]);
+            return scales[state.activeData](data[state.activeData][state.activeYear]);
           }
           // no data
           return colours.grey[9];
@@ -68,8 +69,21 @@ var MeasureToggleGroup = connectMap({
   value : 'activeData'
 })(ToggleBarRaw);
 
-var Tooltip = connectMap({
-  show : 'tooltipShow'
+var Tooltip = connect(function(state) {
+  return {
+    show : state.tooltipShow,
+    mouseX : state.tooltipContents && state.tooltipContents.mouseX,
+    mouseY : state.tooltipContents && state.tooltipContents.mouseY,
+    template : function() {
+      if(!state.tooltipContents) { return ''; }
+      var iso = state.tooltipContents.ISO;
+      var countryName = iso ? countries[iso].name : '';
+      return (<div>
+        <h4>{countryName}</h4>
+        <div>{state.tooltipContents[state.activeData][state.activeYear]}</div>
+      </div>);
+    }
+  };
 })(TooltipRaw);
 
 class Chart extends ChartContainer {
@@ -92,9 +106,13 @@ class Chart extends ChartContainer {
       layerHandlers : {
         countries : {
           mouseenter : function(d) {
-            console.log(d3.event);
             var key = d.properties.iso_a3;
             var data = store.getState().data.find(v => v.ISO === key);
+
+            data = Im.extend(data, {
+              mouseX : d3.event.clientX,
+              mouseY : d3.event.clientY
+            });
             store.dispatch(showTooltip(data));
           },
           mouseleave : function(d) {
