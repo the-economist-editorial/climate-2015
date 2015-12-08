@@ -164,7 +164,7 @@ class Chart extends ChartContainer {
 
     var gradientScaleProps = {
       margin : [320, 10, 10]
-    }
+    };
 
     return(
       <div className='chart-container'>

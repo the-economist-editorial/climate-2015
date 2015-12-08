@@ -22,6 +22,15 @@ class Tag extends React.Component {
 
 /**
  * this is a basic scale for a color gradient
+ *
+ * @prop {Chroma scale} scale - the gradient scale
+ * @prop {function} formatter - a formatter for ticks on the scale
+ * @prop {array} tag - points on the scale to highlight.
+ * @prop {string|optional} mod - if you need to modify the scale (e.g.
+ *       use a logarithmic scale)
+ * @prop {array|Optional} modDomain - an alternate domain, in case the
+ *       modified scale requires a different domain (e.g. a log scale
+ *       can't contain zero)
  */
 export default class GradientScale extends BoundedSVG {
   static get defaultProps() {
