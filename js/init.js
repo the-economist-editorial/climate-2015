@@ -36,18 +36,20 @@ window.store = store;
 var scaleColours = [colours.blue[1], colours.red[3], colours.red[0]];
 var datasets = {
   co2 : {
-    scale : chroma.scale(scaleColours).mode('lab').domain([0,1e4,1e7]),
+    scale : chroma.scale(scaleColours).mode('lab').domain([0,5e5,1e7]),
     formatter : d3.format(',.0f'),
-    tag : [0, 1e4, 1e7]
+    tagFormatter : d3.format(',s'),
+    tag : [0,5e5,1e7]
   },
   co2pc : {
     scale : chroma.scale(scaleColours).mode('lab').domain([0,3,22]),
     formatter : d3.format(',.2f'),
-    tag : [0, 3, 22]
+    tag : [0,3,22]
   },
   co2pcgdp : {
     scale : chroma.scale(scaleColours).mode('lab').domain([0,200,2000]),
-    formatter : d3.format(',.2f')
+    formatter : d3.format(',.2f'),
+    tag : [0,200,2000]
   },
   ghg : {
     scale : chroma.scale(scaleColours).mode('lab').domain([0,1e5,1.25e7]),
@@ -106,8 +108,11 @@ var Tooltip = connect(function(state) {
 })(TooltipRaw);
 
 var GradientScale = connect(function(state) {
+  var set = datasets[state.activeData];
   return {
-    scale : datasets[state.activeData].scale
+    scale : set.scale,
+    tag : set.tag || null,
+    formatter : set.tagFormatter || set.formatter
   };
 })(GradientScaleRaw);
 

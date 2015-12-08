@@ -23,23 +23,30 @@ class Tag extends React.Component {
 export default class GradientScale extends BoundedSVG {
   static get defaultProps() {
     return Im.extend(super.defaultProps, {
-      scale : chroma.scale(['#FFF', '#f00', '#000']).domain([0,40,200])
+      scale : chroma.scale(['#FFF', '#f00', '#000']).domain([0,40,200]),
+      formatter : v => v
     });
   }
   render() {
     var domain = this.props.scale.domain();
     var converter = d3.scale.linear().domain([0, 100]).range(domain);
 
-    var stops = d3.range(0,101,5);
+    var stops = d3.range(5,100,5);
 
     var tag = this.props.tag || domain;
+
+    stops = stops.concat(tag.map(t => converter.invert(t)))
+      // stops must be in order
+      .sort((a,b) => { return a - b; })
+      // stops ought to be unique, just because...
+      .filter((item, pos, ary) => !pos || item != ary[pos - 1]);
 
     var stopElements = stops.map(s => {
       return (<stop offset={s + '%'} stopColor={this.props.scale(converter(s))} />);
     });
 
     var tags = tag.map(t => {
-
+      return(<Tag point={converter.invert(t) * 2} label={this.props.formatter(t)} />);
     });
 
     return (<g transform={generateTranslateString(this.leftBound, this.topBound)}>
@@ -47,7 +54,7 @@ export default class GradientScale extends BoundedSVG {
         {stopElements}
       </linearGradient>
       <rect fill="url(#gradient-scale-gradient)" x="0" y="5" width="200" height="15"></rect>
-      <Tag />
+      {tags}
     </g>);
   }
 }
