@@ -14,6 +14,7 @@ import D3MapRaw from './d3map.js';
 import TooltipRaw from './tooltip.js';
 import ChartContainer from './chart-container.js';
 import GradientScaleRaw from './gradient-scale.js';
+import SliderRaw from './slider.js';
 
 import countries from './countries.js';
 
@@ -36,10 +37,12 @@ window.store = store;
 var scaleColours = [colours.blue[1], colours.red[3], colours.red[0]];
 var datasets = {
   co2 : {
-    scale : chroma.scale(scaleColours).mode('lab').domain([0,5e5,1e7]),
+    scale : chroma.scale(scaleColours).mode('lab').domain([0,1e5,1e7]),
     formatter : d3.format(',.0f'),
     tagFormatter : d3.format(',s'),
-    tag : [0,5e5,1e7]
+    tag : [1,1e5,1e7],
+    mod: 'log',
+    modDomain : [1, 1e7]
   },
   co2pc : {
     scale : chroma.scale(scaleColours).mode('lab').domain([0,3,22]),
@@ -47,17 +50,22 @@ var datasets = {
     tag : [0,3,22]
   },
   co2pcgdp : {
-    scale : chroma.scale(scaleColours).mode('lab').domain([0,200,2000]),
+    scale : chroma.scale(scaleColours).mode('lab').domain([0,300,2000]),
     formatter : d3.format(',.2f'),
-    tag : [0,200,2000]
+    tag : [0,300,2000]
   },
   ghg : {
     scale : chroma.scale(scaleColours).mode('lab').domain([0,1e5,1.25e7]),
-    formatter : d3.format(',.0f')
+    formatter : d3.format(',.0f'),
+    tagFormatter : d3.format(',s'),
+    tag : [1,1e5,1.25e7],
+    mod : 'log',
+    modDomain : [1, 1.25e7]
   },
   ghgpc : {
     scale : chroma.scale(scaleColours).mode('lab').domain([0,5,25]),
-    formatter : d3.format(',.2f')
+    formatter : d3.format(',.2f'),
+    tag : [0,5,25]
   }
 };
 
@@ -112,7 +120,9 @@ var GradientScale = connect(function(state) {
   return {
     scale : set.scale,
     tag : set.tag || null,
-    formatter : set.tagFormatter || set.formatter
+    formatter : set.tagFormatter || set.formatter,
+    mod : set.mod || null,
+    modDomain : set.modDomain || null
   };
 })(GradientScaleRaw);
 

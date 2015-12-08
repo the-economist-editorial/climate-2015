@@ -10,6 +10,10 @@
   /*fill : var(--grey-9);*/
 }
 
+.chart-container .tab-bar .tab {
+  flex-basis: auto;  /* non-uniform tab widths */
+}
+
 .tooltip {
   font-size: 14px;
   padding: 2px 5px;

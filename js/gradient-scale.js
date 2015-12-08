@@ -20,33 +20,47 @@ class Tag extends React.Component {
   }
 }
 
+/**
+ * this is a basic scale for a color gradient
+ */
 export default class GradientScale extends BoundedSVG {
   static get defaultProps() {
     return Im.extend(super.defaultProps, {
       scale : chroma.scale(['#FFF', '#f00', '#000']).domain([0,40,200]),
-      formatter : v => v
+      formatter : v => v,
+      mod : null,
+      modDomain : null
     });
   }
   render() {
     var domain = this.props.scale.domain();
-    var converter = d3.scale.linear().domain([0, 100]).range(domain);
+    var scaleType = 'linear';
+    switch(this.props.mod) {
+      case 'log':
+        scaleType = 'log';
+        break;
+    }
+    var converter = d3.scale[scaleType]().domain(this.props.modDomain || domain).range([0, 100]);
+    // console.log(domain, converter.invert(5));
 
     var stops = d3.range(5,100,5);
 
     var tag = this.props.tag || domain;
 
-    stops = stops.concat(tag.map(t => converter.invert(t)))
+    stops = stops.concat(tag.map(t => converter(t)))
       // stops must be in order
       .sort((a,b) => { return a - b; })
       // stops ought to be unique, just because...
       .filter((item, pos, ary) => !pos || item != ary[pos - 1]);
 
+    console.log(stops, stops.map(converter.invert));
+
     var stopElements = stops.map(s => {
-      return (<stop offset={s + '%'} stopColor={this.props.scale(converter(s))} />);
+      return (<stop offset={s + '%'} stopColor={this.props.scale(converter.invert(s))} />);
     });
 
     var tags = tag.map(t => {
-      return(<Tag point={converter.invert(t) * 2} label={this.props.formatter(t)} />);
+      return(<Tag point={converter(t) * 2} label={this.props.formatter(t)} />);
     });
 
     return (<g transform={generateTranslateString(this.leftBound, this.topBound)}>
