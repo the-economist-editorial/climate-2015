@@ -42,17 +42,23 @@ var datasets = {
     tagFormatter : d3.format(',s'),
     tag : [1,1e5,1e7],
     mod: 'log',
-    modDomain : [1, 1e7]
+    modDomain : [1, 1e7],
+    unit : (<span>kton CO<sub>2</sub> per year</span>),
+    subtitle : 'Emissions from fossil fuel use and cement production, 2012'
   },
   co2pc : {
     scale : chroma.scale(scaleColours).mode('lab').domain([0,3,22]),
     formatter : d3.format(',.2f'),
-    tag : [0,3,22]
+    tag : [0,3,22],
+    unit : 'ton CO2 per person per year',
+    subtitle : 'Emissions from fossil fuel use and cement production, 2012'
   },
   co2pcgdp : {
     scale : chroma.scale(scaleColours).mode('lab').domain([0,300,2000]),
     formatter : d3.format(',.2f'),
-    tag : [0,300,2000]
+    tag : [0,300,2000],
+    unit : 'per $1,000* GDP',
+    subtitle : 'Emissions from fossil fuel use and cement production, 2012'
   },
   ghg : {
     scale : chroma.scale(scaleColours).mode('lab').domain([0,1e5,1.25e7]),
@@ -60,17 +66,31 @@ var datasets = {
     tagFormatter : d3.format(',s'),
     tag : [1,1e5,1.25e7],
     mod : 'log',
-    modDomain : [1, 1.25e7]
+    modDomain : [1, 1.25e7],
+    maxYear : 2012,
+    unit : 'megatons CO2 equivalent',
+    subtitle : 'Greenhouse gas emissions*, 2014'
   },
   ghgpc : {
     scale : chroma.scale(scaleColours).mode('lab').domain([0,5,25]),
     formatter : d3.format(',.2f'),
-    tag : [0,5,25]
+    tag : [0,5,25],
+    maxYear : 2012,
+    unit : 'tons of CO2 equivalent',
+    subtitle : 'Greenhouse gas emissions*, 2014'
   }
 };
 
+var TiedHeader = connect(function(state) {
+  return {
+    subtitle : datasets[state.activeData].subtitle
+  };
+})(Header);
+
 var D3Map = connect(function(state) {
   var hasData = !!state.data.length;
+  var metadata = datasets[state.activeData];
+  var year = metadata.maxYear ? Math.min(state.activeYear, metadata.maxYear) : state.activeYear;
   return {
     layers : [
       { data : state.countries, name : 'countries' },
@@ -83,7 +103,7 @@ var D3Map = connect(function(state) {
           var data = state.data.filter(r => r.ISO === iso);
           data = data.length ? data[0] : null;
           if(hasData && data) {
-            return datasets[state.activeData].scale(data[state.activeData][state.activeYear]);
+            return metadata.scale(data[state.activeData][year]);
           }
           // no data
           return colours.grey[9];
@@ -98,6 +118,8 @@ var MeasureToggleGroup = connectMap({
 })(ToggleBarRaw);
 
 var Tooltip = connect(function(state) {
+  var metadata = datasets[state.activeData];
+  var year = metadata.maxYear ? Math.min(state.activeYear, metadata.maxYear) : state.activeYear;
   return {
     show : countries.hasOwnProperty(state.tooltipContents && state.tooltipContents.ISO) ? state.tooltipShow : false,
     mouseX : state.tooltipContents && state.tooltipContents.mouseX,
@@ -106,10 +128,10 @@ var Tooltip = connect(function(state) {
       if(!state.tooltipContents) { return ''; }
       var iso = state.tooltipContents.ISO;
       var countryName = iso ? countries[iso].name : '';
-      var datum = state.tooltipContents[state.activeData][state.activeYear];
+      var datum = state.tooltipContents[state.activeData][year];
       return (<div>
         <h4>{countryName}</h4>
-        <div>{datasets[state.activeData].formatter(datum)}</div>
+        <div>{metadata.formatter(datum)}</div>
       </div>);
     }
   };
@@ -131,10 +153,10 @@ class Chart extends ChartContainer {
     var measureToggleProps = {
       items : [
         { title : 'CO2', key : 'co2', value : 'co2' },
-        { title : 'CO2 per capita', key : 'co2pc', value : 'co2pc' },
+        { title : 'CO2 per person', key : 'co2pc', value : 'co2pc' },
         { title : 'CO2 per GDP', key : 'co2pcgdp', value : 'co2pcgdp' },
         { title : 'Greenhouse gases', key : 'ghg', 'value' : 'ghg' },
-        { title : 'GHG per capita', key : 'ghgpc', 'value' : 'ghgpc'}
+        { title : 'GHG per person', key : 'ghgpc', 'value' : 'ghgpc'}
       ],
       action : (v) => { store.dispatch(updateActiveData(v)); }
     };
@@ -168,7 +190,7 @@ class Chart extends ChartContainer {
 
     return(
       <div className='chart-container'>
-        <Header title="A map" subtitle="Also to come"/>
+        <TiedHeader title="A map" />
         <MeasureToggleGroup {...measureToggleProps} />
         <svg height={mapHeight + 50} width="595">
           <D3Map {...mapProps} />
@@ -191,7 +213,7 @@ function fetchTopojson(file, action, group) {
   });
 }
 
-d3.csv('../data/joined.csv', function(err, data) {
+d3.csv('./data/joined2.csv', function(err, data) {
   const DATA_SERIES = ['co2', 'co2pc', 'co2pcgdp', 'ghg', 'ghgpc'];
   data = data.map(parseNumerics);
 

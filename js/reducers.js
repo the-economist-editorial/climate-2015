@@ -16,7 +16,7 @@ var initialState = {
   countries : [],
   borders : [],
   activeData : 'co2',
-  activeYear : '2012',
+  activeYear : 2014,
   tooltipShow : false,
   tooltipContents : null
 };
