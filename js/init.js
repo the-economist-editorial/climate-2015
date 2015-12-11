@@ -50,7 +50,7 @@ var datasets = {
     scale : chroma.scale(scaleColours).mode('lab').domain([0,3,22]),
     formatter : d3.format(',.2f'),
     tag : [0,3,22],
-    unit : 'ton CO2 per person per year',
+    unit : (<span>ton CO<sub>2</sub> per person per year</span>),
     subtitle : 'Emissions from fossil fuel use and cement production, 2012'
   },
   co2pcgdp : {
@@ -68,7 +68,7 @@ var datasets = {
     mod : 'log',
     modDomain : [1, 1.25e7],
     maxYear : 2012,
-    unit : 'megatons CO2 equivalent',
+    unit : (<span>megatons CO<sub>2</sub> equivalent</span>),
     subtitle : 'Greenhouse gas emissions*, 2014'
   },
   ghgpc : {
@@ -76,7 +76,7 @@ var datasets = {
     formatter : d3.format(',.2f'),
     tag : [0,5,25],
     maxYear : 2012,
-    unit : 'tons of CO2 equivalent',
+    unit : (<span>tons of CO<sub>2</sub> equivalent</span>),
     subtitle : 'Greenhouse gas emissions*, 2014'
   }
 };
@@ -131,7 +131,7 @@ var Tooltip = connect(function(state) {
       var datum = state.tooltipContents[state.activeData][year];
       return (<div>
         <h4>{countryName}</h4>
-        <div>{metadata.formatter(datum)}</div>
+        <div>{metadata.formatter(datum)} {metadata.unit}</div>
       </div>);
     }
   };
@@ -148,13 +148,31 @@ var GradientScale = connect(function(state) {
   };
 })(GradientScaleRaw);
 
+class TextSection extends React.Component {
+  static get defaultProps() {
+    return {
+      text : 'foo'
+    };
+  }
+  render() {
+    var classes = this.props.classes;
+    return (<span class={classes}>{this.props.text}</span>);
+  }
+}
+
+var UnitText = connect(function(state) {
+  return {
+    text : datasets[state.activeData].unit
+  };
+})(TextSection);
+
 class Chart extends ChartContainer {
   render() {
     var measureToggleProps = {
       items : [
-        { title : 'CO2', key : 'co2', value : 'co2' },
-        { title : 'CO2 per person', key : 'co2pc', value : 'co2pc' },
-        { title : 'CO2 per GDP', key : 'co2pcgdp', value : 'co2pcgdp' },
+        { title : (<span>CO<sub>2</sub></span>), key : 'co2', value : 'co2' },
+        { title : (<span>CO<sub>2</sub> per person</span>), key : 'co2pc', value : 'co2pc' },
+        { title : (<span>CO<sub>2</sub> per GDP</span>), key : 'co2pcgdp', value : 'co2pcgdp' },
         { title : 'Greenhouse gases', key : 'ghg', 'value' : 'ghg' },
         { title : 'GHG per person', key : 'ghgpc', 'value' : 'ghgpc'}
       ],
@@ -185,7 +203,7 @@ class Chart extends ChartContainer {
     };
 
     var gradientScaleProps = {
-      margin : [320, 10, 10]
+      margin : [320, 120, 10]
     };
 
     return(
@@ -196,6 +214,7 @@ class Chart extends ChartContainer {
           <D3Map {...mapProps} />
           <GradientScale {...gradientScaleProps} />
         </svg>
+        <UnitText />
         <Tooltip />
       </div>
     );
