@@ -1,5 +1,4 @@
 import React from 'react';
-import InteractiveComponent from './interactive-component.js';
 
 /**
  * A tooltip
@@ -8,7 +7,7 @@ import InteractiveComponent from './interactive-component.js';
  * @prop {function} template - how to format the data point given to
  *       the tooltip into a display. Takes `this.props` as an argument
  */
-export default class Tooltip extends InteractiveComponent {
+export default class Tooltip extends React.Component {
   static get defaultProps() {
     return {
       template : () => {
