@@ -43,14 +43,14 @@ var datasets = {
     tag : [1,1e5,1e7],
     mod: 'log',
     modDomain : [1, 1e7],
-    unit : (<span>kton CO<sub>2</sub> per year</span>),
+    unit : (<span>kilotonnes of CO<sub>2</sub> per year</span>),
     subtitle : 'From fossil fuel use and cement production, 2014'
   },
   co2pc : {
     scale : chroma.scale(scaleColours).mode('lab').domain([0,3,22]),
     formatter : d3.format(',.2f'),
     tag : [0,3,22],
-    unit : (<span>ton CO<sub>2</sub> per person per year</span>),
+    unit : (<span>tonnes of CO<sub>2</sub> per person per year</span>),
     subtitle : 'From fossil fuel use and cement production, 2014'
   },
   co2pcgdp : {
@@ -68,7 +68,7 @@ var datasets = {
     mod : 'log',
     modDomain : [1, 1.25e7],
     maxYear : 2012,
-    unit : (<span>megatons CO<sub>2</sub> equivalent</span>),
+    unit : (<span>megatonnes of CO<sub>2</sub> equivalent</span>),
     subtitle : 'Greenhouse gases*, 2012'
   },
   ghgpc : {
@@ -76,7 +76,7 @@ var datasets = {
     formatter : d3.format(',.2f'),
     tag : [0,5,25],
     maxYear : 2012,
-    unit : (<span>tons of CO<sub>2</sub> equivalent</span>),
+    unit : (<span>tonnes of CO<sub>2</sub> equivalent</span>),
     subtitle : 'Greenhouse gases*, 2012'
   }
 };
@@ -171,7 +171,7 @@ class Chart extends ChartContainer {
       items : [
         { title : (<span>CO<sub>2</sub></span>), key : 'co2', value : 'co2' },
         { title : (<span>CO<sub>2</sub> per person</span>), key : 'co2pc', value : 'co2pc' },
-        { title : (<span>CO<sub>2</sub> per GDP</span>), key : 'co2pcgdp', value : 'co2pcgdp' },
+        { title : (<span>CO<sub>2</sub> per unit of GDP</span>), key : 'co2pcgdp', value : 'co2pcgdp' },
         { title : 'Greenhouse gases', key : 'ghg', 'value' : 'ghg' },
         { title : 'GHG per person', key : 'ghgpc', 'value' : 'ghgpc'}
       ],
@@ -214,7 +214,7 @@ class Chart extends ChartContainer {
           <GradientScale {...gradientScaleProps} />
         </svg>
         <UnitText />
-        <div className="note"><super>†</super>US dollars at 2012 PPP</div>
+        <div className="note"><super>†</super>$2012 at purchasing-power parity</div>
         <div className="note">*CO<sub>2</sub>, CH<sub>4</sub>, N<sub>2</sub>O, F-gases</div>
         <div className="source">Source: Emission Database for Global Atmospheric Research</div>
         <Tooltip />
