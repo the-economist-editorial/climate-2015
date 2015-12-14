@@ -44,21 +44,21 @@ var datasets = {
     mod: 'log',
     modDomain : [1, 1e7],
     unit : (<span>kton CO<sub>2</sub> per year</span>),
-    subtitle : 'Emissions from fossil fuel use and cement production, 2012'
+    subtitle : 'From fossil fuel use and cement production, 2014'
   },
   co2pc : {
     scale : chroma.scale(scaleColours).mode('lab').domain([0,3,22]),
     formatter : d3.format(',.2f'),
     tag : [0,3,22],
     unit : (<span>ton CO<sub>2</sub> per person per year</span>),
-    subtitle : 'Emissions from fossil fuel use and cement production, 2012'
+    subtitle : 'From fossil fuel use and cement production, 2014'
   },
   co2pcgdp : {
     scale : chroma.scale(scaleColours).mode('lab').domain([0,300,2000]),
     formatter : d3.format(',.2f'),
     tag : [0,300,2000],
-    unit : 'per $1,000* GDP',
-    subtitle : 'Emissions from fossil fuel use and cement production, 2012'
+    unit : (<span>per $1,000<super>†</super> GDP</span>),
+    subtitle : 'From fossil fuel use and cement production, 2014'
   },
   ghg : {
     scale : chroma.scale(scaleColours).mode('lab').domain([0,1e5,1.25e7]),
@@ -69,7 +69,7 @@ var datasets = {
     modDomain : [1, 1.25e7],
     maxYear : 2012,
     unit : (<span>megatons CO<sub>2</sub> equivalent</span>),
-    subtitle : 'Greenhouse gas emissions*, 2014'
+    subtitle : 'Greenhouse gases*, 2012'
   },
   ghgpc : {
     scale : chroma.scale(scaleColours).mode('lab').domain([0,5,25]),
@@ -77,7 +77,7 @@ var datasets = {
     tag : [0,5,25],
     maxYear : 2012,
     unit : (<span>tons of CO<sub>2</sub> equivalent</span>),
-    subtitle : 'Greenhouse gas emissions*, 2014'
+    subtitle : 'Greenhouse gases*, 2012'
   }
 };
 
@@ -155,8 +155,7 @@ class TextSection extends React.Component {
     };
   }
   render() {
-    var classes = this.props.classes;
-    return (<span class={classes}>{this.props.text}</span>);
+    return (<span className='legend-label'>{this.props.text}</span>);
   }
 }
 
@@ -203,18 +202,21 @@ class Chart extends ChartContainer {
     };
 
     var gradientScaleProps = {
-      margin : [320, 120, 10]
+      margin : [320, 100, 10]
     };
 
     return(
       <div className='chart-container'>
-        <TiedHeader title="A map" />
+        <TiedHeader title="Global emissions" />
         <MeasureToggleGroup {...measureToggleProps} />
         <svg height={mapHeight + 50} width="595">
           <D3Map {...mapProps} />
           <GradientScale {...gradientScaleProps} />
         </svg>
         <UnitText />
+        <div className="note"><super>†</super>US dollars at 2012 PPP</div>
+        <div className="note">*CO<sub>2</sub>, CH<sub>4</sub>, N<sub>2</sub>O, F-gases</div>
+        <div className="source">Source: Emission Database for Global Atmospheric Research</div>
         <Tooltip />
       </div>
     );

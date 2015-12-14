@@ -18,3 +18,13 @@
   font-size: 14px;
   padding: 2px 5px;
 }
+
+.legend-label {
+  position: absolute;
+  top: 420px;
+  left: 305px;
+}
+
+.note {
+  float: right;
+}

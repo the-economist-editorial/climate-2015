@@ -20,8 +20,20 @@
 .interactive-header h1 {
   font-size: 18px;
   line-height: 18px;
+  margin-bottom: 4px;
 }
 .interactive-header h2 {
   font-weight: normal;
   font-size: 14px;
+}
+
+super {
+  vertical-align: super;
+}
+sub {
+  vertical-align: sub;
+}
+super,sub {
+  font-size: 80%;
+  line-height: 0.5;
 }
